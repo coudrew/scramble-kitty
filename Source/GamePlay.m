@@ -3,7 +3,7 @@
 //  tappyCat
 //
 //  Created by Andrew R Couture on 2014-11-17.
-//  Copyright (c) 2014 Apportable. All rights reserved.
+//  Copyright (c) 2014 coudrew. All rights reserved.
 //
 
 #import "GamePlay.h"
@@ -21,10 +21,16 @@
     CGPoint        _accel;
     BackGround     *_floor1;
     BackGround     *_floor2;
+    CCLabelTTF     *_score;
+    CCLabelTTF     *_lives;
+    NSString       *score;
+    NSString       *lives;
 }
 
 
 -(void)initialise {
+    //[self removeAllChildren];
+    [self setupHUD];
     _cat = (Cat *)[CCBReader load:@"Cat"];
     _cat.position = ccp(160, 170);
     _cat.scale = 0.75;
@@ -49,7 +55,16 @@
    
 }
 
-
+-(void)setupHUD {
+    score = [NSString stringWithFormat:@"score: %i", [SKGameData sharedGameData].score];
+    _score = [CCLabelTTF labelWithString:score fontName:@"Chalkduster" fontSize:14.0];
+    _score.position = ccp(50, 540);
+    [self addChild:_score];
+    lives = [NSString stringWithFormat:@"lives: %i", [SKGameData sharedGameData].lives];
+    _lives = [CCLabelTTF labelWithString:lives fontName:@"Chalkduster" fontSize:14.0];
+    _lives.position = ccp(270, 540);
+    [self addChild:_lives];
+}
 
 -(void)didLoadFromCCB {
     [self initialise];
@@ -112,11 +127,14 @@
     [_killCouch removeAllObjects];
     for (Couch *couch in _couches) {
         if (CGRectIntersectsRect(couch.boundingBox, _cat.boundingBox)) {
+            [SKGameData sharedGameData].lives -= 1;
             CCScene *fail = [CCBReader loadAsScene:@"Fail"];
             [[CCDirector sharedDirector] replaceScene:fail];
         }
     }
     if (CGRectIntersectsRect(_laserDot.boundingBox, _cat.boundingBox)) {
+        [SKGameData sharedGameData].score += 1;
+        [SKGameData sharedGameData].lives += 1;
         CCScene *stageClear = [CCBReader loadAsScene:@"StageClear"];
         [[CCDirector sharedDirector] replaceScene:stageClear];
     }

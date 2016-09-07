@@ -8,6 +8,15 @@
 
 #import <Foundation/Foundation.h>
 
-@interface SKGameData : NSObject
+@interface SKGameData : NSObject <NSCoding>
+
+@property (assign, nonatomic) int score;
+@property (assign, nonatomic) int lives;
+
++(instancetype)sharedGameData;
++(instancetype)loadInstance;
++(NSString *)filepath;
+-(void)reset;
+-(void)saveGame;
 
 @end
